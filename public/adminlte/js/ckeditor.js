@@ -1,0 +1,26 @@
+CKEDITOR.editorConfig = function( config ) {
+    
+    config.filebrowserBrowseUrl = '/elfinder/ckeditor'
+    config.toolbarGroups = [
+        { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+        { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+        { name: 'links' },
+        { name: 'insert' },
+        { name: 'forms' },
+        { name: 'tools' },
+        { name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
+        { name: 'others' },
+        //'/',
+        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+        { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+        { name: 'styles' },
+        { name: 'colors' }
+    ];
+    //add source dialog plugins
+
+    // 
+    config.removeDialogTabs = 'image:advanced';
+    config.extraPlugins = 'clipboard,pastetext';
+    config.allowedContent = true;
+}
+
