@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
 
 <p align="center">
@@ -76,3 +77,21 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+=======
+# installation and running
+ pre-requite
+ php v >= 7.2.5 
+ install composer (getcomposer.org)
+	installation
+ clone repository: git clone https://github.com/edmichs/pharelle_test.git
+
+	run command :  cd phraelle_test
+	create .env file (copy .env.example and rename this)
+	config your database
+ generate app key : php artisan key:generate
+	install dependencie : composer install
+	run migration : php artisan migrate
+	and enjoy : php artisan serve
+ 
+
+>>>>>>> 55b78f4a484bf606c62f851a5d85000650b0ac38
