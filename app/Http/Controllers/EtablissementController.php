@@ -9,6 +9,10 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use Kreait\Firebase;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+use Kreait\Firebase\Database;
 
 class EtablissementController extends AppBaseController
 {
@@ -29,9 +33,23 @@ class EtablissementController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $etablissements = $this->etablissementRepository->all();
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
 
-        return view('etablissements.index')
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->withDatabaseUri('https://monimoo-29336.firebaseio.com/')
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('etablissements');
+        $etabs = $ref->getValue();
+        foreach ($etabs as $etab) {
+            $etablissements[] = $etab;
+        }
+        // $etablissements = $this->etablissementRepository->all();
+
+         return view('etablissements.index')
             ->with('etablissements', $etablissements);
     }
 
@@ -54,13 +72,30 @@ class EtablissementController extends AppBaseController
      */
     public function store(CreateEtablissementRequest $request)
     {
-        $input = $request->all();
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
 
-        $etablissement = $this->etablissementRepository->create($input);
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('etablissements');
+        $key = $ref->push()->getKey();
+        $ref->getChild($key)->set([
+            'name' => $request->get('name'),
+            'location' => $request->get('location'),
+            'description' => $request->get('description')
+        ]);
+        
+
+        // $input = $request->all();
+
+        // $etablissement = $this->etablissementRepository->create($input);
 
         Flash::success('Etablissement saved successfully.');
 
-        return redirect(route('etablissements.index'));
+         return redirect(route('etablissements.index'));
     }
 
     /**

@@ -9,12 +9,12 @@
         <tbody>
         @foreach($classes as $classe)
             <tr>
-                <td>{{$classe->name}}</td>
+                <td>{{$classe['name']}}</td>
                 <td>
-                    {!! Form::open(['route' => ['classes.destroy', $classe->id], 'method' => 'delete']) !!}
+                    {!! Form::open(['route' => ['classes.destroy', $classe['name']], 'method' => 'delete']) !!}
                     <div class='btn-group'>
-                        <a href="{{ route('classes.show', [$classe->id]) }}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
-                        <a href="{{ route('classes.edit', [$classe->id]) }}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
+                        <a href="{{ route('classes.show', [$classe['name']]) }}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
+                        <a href="{{ route('classes.edit', [$classe['name']]) }}" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
                         {!! Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]) !!}
                     </div>
                     {!! Form::close() !!}

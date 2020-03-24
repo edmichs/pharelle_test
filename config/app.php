@@ -174,7 +174,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        //Firebase provider
+        Kreait\Laravel\Firebase\ServiceProvider::class,
         //gravatar
         Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider::class
     ],

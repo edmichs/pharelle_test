@@ -9,6 +9,10 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use Kreait\Firebase;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+use Kreait\Firebase\Database;
 
 class RoleController extends AppBaseController
 {
@@ -29,7 +33,20 @@ class RoleController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $roles = $this->roleRepository->all();
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
+
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->withDatabaseUri('https://monimoo-29336.firebaseio.com/')
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('roles');
+        $rolesFromDatabase = $ref->getValue();
+        foreach ($rolesFromDatabase as $role) {
+            $roles[] = $role;
+        }
 
         return view('roles.index')
             ->with('roles', $roles);
@@ -54,9 +71,21 @@ class RoleController extends AppBaseController
      */
     public function store(CreateRoleRequest $request)
     {
-        $input = $request->all();
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
 
-        $role = $this->roleRepository->create($input);
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('roles');
+        $key = $ref->push()->getKey();
+        $ref->getChild($key)->set([
+            'name' => $request->get('name'),
+            'guard_name' => $request->get('guard_name')
+        ]);
+
 
         Flash::success('Role saved successfully.');
 

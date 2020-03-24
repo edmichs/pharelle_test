@@ -9,6 +9,14 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use Illuminate\Support\Facades\Hash;
+use Kreait\Firebase;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+use Kreait\Firebase\Database;
+use Illuminate\Support\Facades\Validator;
+
+
 
 class UserController extends AppBaseController
 {
@@ -29,7 +37,20 @@ class UserController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $users = $this->userRepository->all();
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
+
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->withDatabaseUri('https://monimoo-29336.firebaseio.com/')
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('users');
+        $usersFromDatabase = $ref->getValue();
+        foreach ($usersFromDatabase as $user) {
+            $users[] = $user;
+        }
 
         return view('users.index')
             ->with('users', $users);
@@ -44,6 +65,20 @@ class UserController extends AppBaseController
     {
         return view('users.create');
     }
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validator(Request $request)
+    {
+        return Validator::make($request, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+    }
 
     /**
      * Store a newly created User in storage.
@@ -54,9 +89,22 @@ class UserController extends AppBaseController
      */
     public function store(CreateUserRequest $request)
     {
-        $input = $request->all();
+       
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
 
-        $user = $this->userRepository->create($input);
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('users');
+        $key = $ref->push()->getKey();
+        $ref->getChild($key)->set([
+            'name' => $request->get('name'),
+            'email' => $request->get('email'),
+            'password' => Hash::make($request->get('password'))
+        ]);
 
         Flash::success('User saved successfully.');
 

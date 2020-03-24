@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 use Flash;
 use Response;
 
+use Kreait\Firebase;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+use Kreait\Firebase\Database;
+
+
 class ClasseController extends AppBaseController
 {
     /** @var  ClasseRepository */
@@ -54,9 +60,19 @@ class ClasseController extends AppBaseController
      */
     public function store(CreateClasseRequest $request)
     {
-        $input = $request->all();
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/FirebaseKey.json');
 
-        $classe = $this->classeRepository->create($input);
+        $firebase = (new Factory)
+
+        ->withServiceAccount($serviceAccount)
+        ->create();
+
+        $database = $firebase->getDatabase();
+        $ref = $database->getReference('classes');
+        $key = $ref->push()->getKey();
+        $ref->getChild($key)->set([
+            'name' => $request->get('name')
+        ]);
 
         Flash::success('Classe saved successfully.');
 
